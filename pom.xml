@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.example</groupId>
+	<artifactId>learn-quasar</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>learn-quasar</name>
+	<description>Quasar project for Kotlin</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.9.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<kotlin.version>1.2.0</kotlin.version>
+		<quasar.version>0.7.9</quasar.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jre8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-reflect</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>co.paralleluniverse</groupId>
+			<artifactId>quasar-kotlin</artifactId>
+			<version>${quasar.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>co.paralleluniverse</groupId>
+			<artifactId>quasar-core</artifactId>
+			<version>${quasar.version}</version>
+			<!--<scope>provided</scope>-->
+			<!--<classifier>jdk8</classifier>-->
+		</dependency>
+
+		<dependency>
+			<groupId>co.paralleluniverse</groupId>
+			<artifactId>quasar-actors</artifactId>
+			<version>${quasar.version}</version>
+		</dependency>
+
+		<!--<dependency>-->
+			<!--<groupId>co.paralleluniverse</groupId>-->
+			<!--<artifactId>quasar-galaxy</artifactId>-->
+			<!--<version>${quasar.version}</version>-->
+		<!--</dependency>-->
+
+		<dependency>
+			<groupId>co.paralleluniverse</groupId>
+			<artifactId>quasar-reactive-streams</artifactId>
+			<version>${quasar.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+		<plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.example.learnquasar.LearnQuasarApplicationKt</mainClass>
+				</configuration>
+      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>pl.project13.maven</groupId>-->
+        <!--<artifactId>git-commit-id-plugin</artifactId>-->
+      <!--</plugin>-->
+      <plugin>
+				<artifactId>kotlin-maven-plugin</artifactId>
+				<groupId>org.jetbrains.kotlin</groupId>
+				<version>${kotlin.version}</version>
+				<configuration>
+					<compilerPlugins>
+						<plugin>spring</plugin>
+					</compilerPlugins>
+					<jvmTarget>1.8</jvmTarget>
+				</configuration>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>test-compile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>test-compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-allopen</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.5.1</version>
+        <executions>
+          <execution>
+            <id>getClasspathFilenames</id>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <!-- Run with "mvn -Pnexus compile dependency:properties exec:exec" -->
+        <version>1.3.2</version>
+        <configuration>
+          <workingDirectory>target/classes</workingDirectory>
+          <executable>java</executable>
+          <arguments>
+            <!-- Turn off before production -->
+            <argument>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argument>
+            <!-- Quasar Agent -->
+            <argument>-javaagent:${co.paralleluniverse:quasar-core:jar}</argument>
+            <!-- Classpath -->
+            <argument>-classpath</argument> <classpath/>
+            <!-- Main class -->
+            <argument>com.example.learnquasar.LearnQuasarApplicationKt</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <argLine>-Dco.paralleluniverse.fibers.verifyInstrumentation=true</argLine>
+          <!-- Quasar Agent -->
+          <argLine>-javaagent:${co.paralleluniverse:quasar-core:jar}</argLine>
+        </configuration>
+      </plugin>
+
+
+			<!--<plugin>-->
+				<!--<groupId>org.apache.maven.plugins</groupId>-->
+				<!--<artifactId>maven-dependency-plugin</artifactId>-->
+				<!--<version>2.9</version>-->
+				<!--<executions>-->
+					<!--<execution>-->
+						<!--<phase>prepare-package</phase>-->
+						<!--<goals>-->
+							<!--<goal>unpack-dependencies</goal>-->
+						<!--</goals>-->
+						<!--<configuration>-->
+							<!--<includeArtifactIds>quasar-core</includeArtifactIds>-->
+							<!--<outputDirectory>${project.build.outputDirectory}</outputDirectory>-->
+						<!--</configuration>-->
+					<!--</execution>-->
+				<!--</executions>-->
+			<!--</plugin>-->
+
+			<!--<plugin>-->
+				<!--<groupId>org.apache.maven.plugins</groupId>-->
+				<!--<artifactId>maven-jar-plugin</artifactId>-->
+				<!--<version>2.5</version>-->
+				<!--<configuration>-->
+					<!--<archive>-->
+						<!--<manifestEntries>-->
+							<!--<Premain-Class>co.paralleluniverse.fibers.instrument.JavaAgent</Premain-Class>-->
+							<!--<Can-Redefine-Classes>true</Can-Redefine-Classes>-->
+							<!--<Can-Retransform-Classes>true</Can-Retransform-Classes>-->
+						<!--</manifestEntries>-->
+					<!--</archive>-->
+				<!--</configuration>-->
+			<!--</plugin>-->
+
+		</plugins>
+	</build>
+
+
+</project>
+
+<!--
+mvn -Pnexus compile dependency:properties exec:exec
+
+# 从命令行方式启动
+
+mvn dependency:copy-dependencies -DoutputDirectory=lib
+
+cp target/learn-quasar-0.0.1-SNAPSHOT.jar.original lib/learn-quasar-0.0.1-SNAPSHOT.jar
+
+java -cp 'lib/*' -javaagent:lib/quasar-core-0.7.9.jar com.example.learnquasar.LearnQuasarApplicationKt
+
+# or use spring boot
+mvn -Pnexus spring-boot:run -Drun.jvmArguments=-javaagent:lib/quasar-core-0.7.9.jar
+
+# NOT OK
+# java  -cp 'lib/*' -javaagent:lib/quasar-core-0.7.9.jar -jar target/learn-quasar-0.0.1-SNAPSHOT.jar
+java  -javaagent:target/learn-quasar-0.0.1-SNAPSHOT.jar -jar target/learn-quasar-0.0.1-SNAPSHOT.jar
+# java -javaagent:lib/quasar-core-0.7.9.jar -jar target/learn-quasar-0.0.1-SNAPSHOT.jar
+
+see also
+https://dzone.com/articles/including-java-agent
+http://www.kubrynski.com/2014/12/include-java-agent-in-standalone-spring.html
+https://github.com/mglanzer/spring-quasar
+
+-->
